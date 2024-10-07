@@ -78,6 +78,11 @@ namespace Exerussus._1Validator
                 
                 foreach (var monoBeh in monoBehs)
                 {
+                    if (monoBeh == null)
+                    {
+                        UnityEngine.Debug.LogError($"{prefab.name} has null component.", prefab);
+                        continue;
+                    }
                     var fieldResult = new Result();
                     if (InvokeValidation(monoBeh)) methodExist = true;
                     foreach (var fieldValidator in _fieldValidators) ValidateComponentFields(monoBeh, fieldValidator.AttributeType, fieldValidator.ValidateField, fieldResult);

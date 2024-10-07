@@ -1,13 +1,8 @@
-﻿#if UNITY_EDITOR
+﻿
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
-using UnityEditor;
-using UnityEngine;
-using Debug = UnityEngine.Debug;
-using Object = UnityEngine.Object;
-
+using Exerussus._1Validator.Validators;
 
 namespace Exerussus._1Validator
 {
@@ -15,18 +10,23 @@ namespace Exerussus._1Validator
     {
         private static List<IFieldValidator> _fieldValidators = new();
         
-        [MenuItem("Tools/Exerussus/Validate")]
+#if UNITY_EDITOR
+        [UnityEditor.MenuItem("Tools/Exerussus/Validate")]
+#endif
         public static void Validate()
         {
+#if UNITY_EDITOR
             SetValidators(ref _fieldValidators);
             ValidateFields();
+#endif
         }
 
+#if UNITY_EDITOR
         #region Base
 
         private static void SetValidators<T>(ref List<T> validators) where T : class, IValidator
         {
-            var types = Assembly.GetExecutingAssembly().GetTypes().Where(t =>
+            var types = System.Reflection.Assembly.GetExecutingAssembly().GetTypes().Where(t =>
                 t.GetInterfaces().Contains(typeof(T)) && !t.IsAbstract && !t.IsInterface).ToList();
             validators.Clear();
             foreach (var type in types) validators.Add(Activator.CreateInstance(type) as T);
@@ -52,11 +52,11 @@ namespace Exerussus._1Validator
 
         private static void ValidateFieldsGameObjects()
         {
-            var allGameObjects = Object.FindObjectsOfType<GameObject>(true);
+            var allGameObjects = UnityEngine.Object.FindObjectsOfType<UnityEngine.GameObject>(true);
 
             foreach (var gameObject in allGameObjects)
             {
-                var components = gameObject.GetComponents<MonoBehaviour>();
+                var components = gameObject.GetComponents<UnityEngine.MonoBehaviour>();
                 foreach (var component in components)
                 {
                     InvokeValidation(component);
@@ -68,12 +68,12 @@ namespace Exerussus._1Validator
         private static void ValidateFieldsPrefabs()
         {
             var prefabs = UnityEditor.AssetDatabase.FindAssets("t:Prefab")
-                .Select(guid => UnityEditor.AssetDatabase.LoadAssetAtPath<GameObject>(UnityEditor.AssetDatabase.GUIDToAssetPath(guid)))
+                .Select(guid => UnityEditor.AssetDatabase.LoadAssetAtPath<UnityEngine.GameObject>(UnityEditor.AssetDatabase.GUIDToAssetPath(guid)))
                 .ToList();
 
             foreach (var prefab in prefabs)
             {
-                var monoBehs = prefab.GetComponentsInChildren<MonoBehaviour>();
+                var monoBehs = prefab.GetComponentsInChildren<UnityEngine.MonoBehaviour>();
                 var methodExist = false;
                 
                 foreach (var monoBeh in monoBehs)
@@ -89,7 +89,7 @@ namespace Exerussus._1Validator
             }
         }
 
-        private static void ValidateComponentFields(MonoBehaviour component, Type attributeType, Action<Component,  FieldInfo, Result> actionWithField, Result result)
+        private static void ValidateComponentFields(UnityEngine.MonoBehaviour component, Type attributeType, Action<UnityEngine.Component,  System.Reflection.FieldInfo, Result> actionWithField, Result result)
         {
             var fields = component.GetType().GetFields(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
     
@@ -97,16 +97,16 @@ namespace Exerussus._1Validator
             {
                 if (Attribute.IsDefined(field, attributeType))
                 {
-                    if (typeof(Component).IsAssignableFrom(field.FieldType))
+                    if (typeof(UnityEngine.Component).IsAssignableFrom(field.FieldType))
                     {
                         actionWithField(component, field, result);
                     }
-                    else Debug.LogError($"Поле не является компонентом!\n{component.GetFullPath()}field : {field.Name}\n", component);
+                    else UnityEngine.Debug.LogError($"Поле не является компонентом!\n{component.GetFullPath()}field : {field.Name}\n", component);
                 }
             }
         }
 
-        private static bool InvokeValidation(MonoBehaviour component)
+        private static bool InvokeValidation(UnityEngine.MonoBehaviour component)
         {
             var methods = component.GetType().GetMethods(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
             var executed = false;
@@ -124,6 +124,7 @@ namespace Exerussus._1Validator
         }
 
         #endregion
+#endif
 
     }
     
@@ -136,10 +137,11 @@ namespace Exerussus._1Validator
     
     public interface IFieldValidator: IValidator
     {
-        public void ValidateField(Component component, FieldInfo field, Validator.Result result);
+#if UNITY_EDITOR
+        public void ValidateField(UnityEngine.Component component, System.Reflection.FieldInfo field, Validator.Result result);
+#endif
     }
     
 #endregion
     
-#endif
 }

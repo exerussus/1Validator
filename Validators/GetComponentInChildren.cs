@@ -1,18 +1,15 @@
-﻿using System;
-using System.Diagnostics;
-using System.Reflection;
-using UnityEngine;
-using Debug = UnityEngine.Debug;
+﻿
 
 namespace Exerussus._1Validator.Validators
 {
+#if UNITY_EDITOR
     public class GetComponentInChildren : IFieldValidator
     {
-        public Type AttributeType => typeof(ValidateGetInChildrenComponentAttribute);
+        public System.Type AttributeType => typeof(ValidateGetInChildrenComponentAttribute);
         
-        public void ValidateField(Component component, FieldInfo field, Validator.Result result)
+        public void ValidateField(UnityEngine.Component component, System.Reflection.FieldInfo field, Validator.Result result)
         {
-            var fieldValue = field.GetValue(component) as Component;
+            var fieldValue = field.GetValue(component) as UnityEngine.Component;
             if (fieldValue == null)
             {
                 var newComponent = component.gameObject.GetComponentInChildren(field.FieldType);
@@ -21,14 +18,15 @@ namespace Exerussus._1Validator.Validators
                     field.SetValue(component, newComponent);
                     result.Changed = true;
                 }
-                else Debug.LogWarning($"Не удалось найти компонент {field.FieldType}!\n{component.GetFullPath()}field : {field.Name}\n", component);
+                else UnityEngine.Debug.LogWarning($"Не удалось найти компонент {field.FieldType}!\n{component.GetFullPath()}field : {field.Name}\n", component);
             }
         }
     }
-
-    [Conditional("UNITY_EDITOR")]
-    [AttributeUsage(AttributeTargets.Field, Inherited = true, AllowMultiple = false)]
-    public class ValidateGetInChildrenComponentAttribute : Attribute
+#endif
+    
+    [System.Diagnostics.Conditional("UNITY_EDITOR")]
+    [System.AttributeUsage(System.AttributeTargets.Field, Inherited = true, AllowMultiple = false)]
+    public class ValidateGetInChildrenComponentAttribute : System.Attribute
     {
         public ValidateGetInChildrenComponentAttribute() {}
     }

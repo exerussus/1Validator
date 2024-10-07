@@ -48,6 +48,7 @@ namespace Exerussus._1Validator
             ValidateFieldsGameObjects();
             ValidateFieldsPrefabs();
             UnityEditor.AssetDatabase.SaveAssets();
+            UnityEngine.Debug.Log("Validation completed.");
         }
 
         private static void ValidateFieldsGameObjects()

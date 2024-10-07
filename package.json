@@ -1,0 +1,21 @@
+{
+  "name": "com.exerussus.1validator",
+  "version": "1.0.0",
+  "displayName": "1Validator",
+  "description": "Набор валидаторов. *** НАХОДИТСЯ В РАННЕЙ СТАДИИ РАЗРАБОТКИ ***",
+  "unity": "2020.3",
+  "dependencies": {},
+  "keywords": [
+    "validator",
+    "1validator",
+    "exerussus"
+  ],
+  "author": {
+    "name": "Exerussus",
+    "email": "solovyov.production@gmail.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/exerussus/1Validator.git"
+  }
+}

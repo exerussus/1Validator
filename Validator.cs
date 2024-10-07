@@ -59,6 +59,11 @@ namespace Exerussus._1Validator
                 var components = gameObject.GetComponents<UnityEngine.MonoBehaviour>();
                 foreach (var component in components)
                 {
+                    if (component == null)
+                    {
+                        UnityEngine.Debug.LogError($"{gameObject.name} has null component.", gameObject);
+                        continue;
+                    }
                     InvokeValidation(component);
                     foreach (var fieldValidator in _fieldValidators) ValidateComponentFields(component, fieldValidator.AttributeType, fieldValidator.ValidateField, new Result());
                 }
